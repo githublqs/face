@@ -31,7 +31,8 @@
 	 -->
 	<mvc:annotation-driven ></mvc:annotation-driven>
 	<mvc:resources location="/js/" mapping="/js/**"/>
-
+	<mvc:resources location="/images/" mapping="/images/**"/>
+	<mvc:resources location="/css/" mapping="/css/**"/>
 	<!-- 视图解析器
 	解析jsp解析，默认使用jstl标签，classpath下的得有jstl的包
 	 -->
