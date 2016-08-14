@@ -15,9 +15,12 @@ import org.springframework.web.servlet.ModelAndView;
 
 import com.face.po.Userinfo;
 import com.face.service.UsernifosService;
-
+import com.mangofactory.swagger.annotations.ApiIgnore;
+import com.wordnik.swagger.annotations.Api;
+import com.wordnik.swagger.annotations.ApiModel;
 @Controller
 @RequestMapping("/userinfos")
+@ApiIgnore
 public class UserInfoController {
 	@Autowired
 	private UsernifosService usernifosService;
@@ -67,8 +70,9 @@ public class UserInfoController {
 	}
 	//@RequestMapping(value={"/index", "/hello"}, method = {RequestMethod.GET})
 	//以上表示的就是可以处理index.action和hello.action的路径。
+	
 	@RequestMapping(value="/login",method = {RequestMethod.POST})
-	public ModelAndView userLogin(/*@RequestParam(value="aa1", required=true) aa,*/ Userinfo userInfo/*,HttpServletRequest request*/){
+	public ModelAndView userLogin(/*@RequestParam(value="aa1", required=true) aa,*/  Userinfo userInfo/*,HttpServletRequest request*/){
 		List<Userinfo> userInfoList=new ArrayList<Userinfo>();
 		ModelAndView modelAndView=new ModelAndView();
 		if(userInfo!=null){

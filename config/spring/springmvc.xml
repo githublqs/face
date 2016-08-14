@@ -43,6 +43,7 @@
 		<!-- 配置jsp路径的后缀 -->
 		<property name="suffix" value=".jsp"/>
 	</bean>
-	
-	
+	<!-- 配置swagger,swagger-ui 相关 --> 
+	<bean class="com.mangofactory.swagger.configuration.SpringSwaggerConfig" />
+	<mvc:resources mapping="/apidoc/**" location="/apidoc/"/>
 </beans>
