@@ -1,27 +1,25 @@
 package com.face.controller;
-
-
 import java.io.File;
 import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import javax.servlet.http.HttpServletResponse;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.client.HttpClientErrorException;
 
 import com.face.po.UploadFace;
-
+import com.google.gson.Gson;
+import com.mangofactory.swagger.annotations.ApiIgnore;
 /*import com.face.entity.UploadFace;
 import com.face.entity.UserfaceImg;
 import com.face.service.UploadFaceService;
 import com.face.service.UserfaceImgService;
 import com.google.gson.Gson;*/
-
+@ApiIgnore
 @Controller
 @RequestMapping(value="/")
 public class UploadFaceAction {
@@ -68,6 +66,14 @@ public String addUploadFace(@ModelAttribute(value="uploadFace")UploadFace upload
 		resultMap.put("matching", "no");
 		out.print(gson.toJson(resultMap));
 	}*/
+	
+	Map<String, String> resultMap=new HashMap<String, String>();
+	resultMap.put("username", "小明");
+	resultMap.put("matching", "yes");//这个接口怎么用示范一下
+	Gson gson=new Gson();
+	PrintWriter out= response.getWriter();
+	out.print(gson.toJson(resultMap));
+	
 	return null;
 }
 }

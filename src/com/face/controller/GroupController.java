@@ -25,6 +25,7 @@ import org.springframework.web.servlet.ModelAndView;
 
 import com.face.po.UamGroup;
 import com.face.tool.json.JacksonJsonUntil;
+import com.mangofactory.swagger.annotations.ApiIgnore;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiParam;
@@ -33,6 +34,7 @@ import com.wordnik.swagger.annotations.ApiResponses;
 /**
  * Created by yuananyun on 2015/11/23.
  */
+@ApiIgnore
 @Controller
 @RequestMapping(value = "/group", produces = {"application/json;charset=UTF-8"})
 @Api(value = "/group", description = "群组的相关操作")
