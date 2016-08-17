@@ -2,6 +2,7 @@ package com.face.controller.action;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Collection;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.MultipartConfig;
@@ -12,6 +13,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.Part;
 
 import com.face.util.SingleEncrypUtil;
+import com.face.util.WebLocalPathUtil;
 
 @MultipartConfig()
 @WebServlet(asyncSupported=true,urlPatterns={"/urlImg"})//设置该controlle支持异步请求，并设置访问路径为
@@ -29,17 +31,63 @@ public class PhotoImg  extends HttpServlet {
  */
 	public void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-		String path=this.getClass().getResource("/").toString();//file:/G:/apache-tomcat-7.0.67/webapps/SSM/WEB-INF/classes/
+		/*String path=this.getClass().getResource("/").toString();//file:/G:/apache-tomcat-7.0.67/webapps/SSM/WEB-INF/classes/
 		path=path.substring(6,path.length()).split("/WEB-INF/classes/")[0];//G:/apache-tomcat-7.0.67/webapps/SSM
 		path=path.replace("/", File.separator);//G:\apache-tomcat-7.0.67\webapps\SSM
 		path=path.replace("\\", File.separator);//G:\apache-tomcat-7.0.67\webapps\SSM
-	    Part part=	 request.getPart("img");
-	  //所用文件全部存为jpg格式
-	    SingleEncrypUtil singleEncrypUtil=new SingleEncrypUtil();
-	    String uploadImg= singleEncrypUtil.getHexString(singleEncrypUtil.getMD5Sole("加密字符串"))+".jpg";
-		part.write(path+File.separator+"uploadface"+File.separator+uploadImg);//uploadImg 文件夹不存在会报错
-		request.getRequestDispatcher("addUploadFace.action?uploadimg="+uploadImg).forward(request, response);//写入文件后写入到数据库中
+		
+*/		
+		String path=WebLocalPathUtil.getRootPath(this);
+		
+		 SingleEncrypUtil singleEncrypUtil=new SingleEncrypUtil();
+		 Collection<Part> parts = request.getParts();
+		if(parts!=null){
+			
+			Part[] partsArray = (Part[])parts.toArray();
+			if(partsArray.length==1){
+				Part part=partsArray[0];
+				  //所用文件全部存为jpg格式
+			    String uploadImg= singleEncrypUtil.getHexString(singleEncrypUtil.getMD5Sole("加密字符串"))+".jpg";
+				part.write(path+File.separator+"uploadface"+File.separator+uploadImg);//uploadImg 文件夹不存在会报错
+				request.getRequestDispatcher("addUploadFace.action?uploadimg="+uploadImg).forward(request, response);//写入文件后写入到数据库中
 
+				
+			}else if(partsArray.length>1){
+				
+				
+				Part part=	 partsArray[0];
+				 String uploadImg0= singleEncrypUtil.getHexString(singleEncrypUtil.getMD5Sole("加密字符串"))+".jpg";
+				part.write(path+File.separator+"uploadface"+File.separator+uploadImg0);//uploadImg 文件夹不存在会报错
+				request.setAttribute("uploadimg0",uploadImg0 );
+					
+				
+				part=partsArray[1];
+				  //所用文件全部存为jpg格式
+			    String uploadImg= singleEncrypUtil.getHexString(singleEncrypUtil.getMD5Sole("加密字符串"))+".jpg";
+				part.write(path+File.separator+"uploadface"+File.separator+uploadImg);//uploadImg 文件夹不存在会报错
+				request.getRequestDispatcher("addUploadFace.action?uploadimg="+uploadImg).forward(request, response);//写入文件后写入到数据库中
+
+			}
+			
+		 }else{
+			 Part part=request.getPart("img0");
+			 if(part!=null){
+				 String uploadImg0= singleEncrypUtil.getHexString(singleEncrypUtil.getMD5Sole("加密字符串"))+".jpg";
+				part.write(path+File.separator+"uploadface"+File.separator+uploadImg0);//uploadImg 文件夹不存在会报错
+				request.setAttribute("uploadimg0",uploadImg0 );	 
+			 }
+			 
+				
+			 
+			 part=	 request.getPart("img");
+			 //所用文件全部存为jpg格式
+		     String uploadImg= singleEncrypUtil.getHexString(singleEncrypUtil.getMD5Sole("加密字符串"))+".jpg";
+			 part.write(path+File.separator+"uploadface"+File.separator+uploadImg);//uploadImg 文件夹不存在会报错
+			 request.getRequestDispatcher("addUploadFace.action?uploadimg="+uploadImg).forward(request, response);//写入文件后写入到数据库中
+
+		 }
+		
+	   
 		
 		
 		/*for (Part part : request.getParts()) {

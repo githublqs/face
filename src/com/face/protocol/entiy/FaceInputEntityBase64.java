@@ -47,6 +47,4 @@ public class FaceInputEntityBase64 implements Serializable{
 		this.img = img;
 		this.img_type = img_type;
 	}
-	
-	
 }

@@ -1,13 +1,24 @@
 package com.face.controller;
+import java.io.File;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.face.po.UploadFace;
 import com.face.protocol.entiy.FaceResultComputeTwoFeatureSimilarity;
 import com.face.protocol.entiy.FaceResultDet;
 import com.face.protocol.entiy.FaceInputComputeFeatureBase64;
@@ -20,12 +31,21 @@ import com.face.protocol.entiy.FaceResultComputeFeature4Multiple;
 import com.face.protocol.entiy.FaceResultComputeFeatureOnSpecifyFaceRect;
 import com.face.protocol.entiy.Face_Rect;
 import com.face.protocol.entiy.Face_RectAndFeature;
+import com.face.service.UploadFaceService;
+import com.face.service.UsernifosService;
+import com.face.util.ImageResizer;
+import com.face.util.WebLocalPathUtil;
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 @Api(value = "/faceRec", description = "人脸识别接口")
 @Controller
 @RequestMapping("/faceRec")
 public class FaceController {
+	@Autowired
+	private UploadFaceService uploadFaceService;
 	///....人脸检测
 	@ApiOperation(notes = "faceDetBase64", httpMethod = "POST", value = "人脸检测(发送图像)")
 	@RequestMapping(value="/faceDetBase64" ,method = RequestMethod.POST)
@@ -39,7 +59,7 @@ public class FaceController {
 				//请求 url指向的图片拿到图像数据
 				List<Face_Rect> face_rect=new ArrayList<Face_Rect>();
 				face_rect.add(new Face_Rect(12, 34, 120, 120));
-				face_rect.add(new Face_Rect(12, 34, 120, 120));
+				face_rect.add(new Face_Rect(80, 80, 240, 300));
 				FaceResultDet result=new FaceResultDet(fieBase64.getId(),2,face_rect,0);
 				return result;
 			}
@@ -192,4 +212,108 @@ public class FaceController {
 		}
 		return new FaceResultComputeTwoFeatureSimilarity("000000000", -9,0.0f);
 	}
+
+	@ApiOperation(notes = "/uploadFaceList", httpMethod = "POST", value = "返回所有已经上传的图片集合")
+	public void uploadFaceList(HttpServletRequest request,HttpServletResponse response){
+		PrintWriter out=null;
+		try {
+			out = response.getWriter();
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		 /*private String thumbnailImgFileName;
+	     private String imgFileiName;
+	     private  String date;*/
+		List<UploadFace> list=uploadFaceService.getAllUploadFaceList();
+		JsonArray jsonArray = new JsonArray();
+		 for (UploadFace uploadFace : list) {
+			 JsonObject jo=new JsonObject();
+			 File thumbnail = generateThumbnail(uploadFace.getUploadimg(),false);
+			 jo.addProperty("thumbnailImgFileName",thumbnail==null?"":thumbnail.getName());
+			 jo.addProperty("imgFileiName",uploadFace.getUploadimg());//这个接口怎么用示范一下
+			 jo.addProperty("date",uploadFace.getUploaddate().toGMTString());//这个接口怎么用示范一下
+			 jsonArray.add(jo);
+		}
+         out.print(jsonArray.toString());
+	}
+	
+	
+	
+	
+	@ApiOperation(notes = "/uploadFaceList/{page}/{pagSize}", httpMethod = "POST", value = "分页返回已经上传的图片集合")
+	/*
+	 * 分页查询 todo 的
+	 */
+	public void uploadFaceListByPage(
+			@PathVariable("page") int page,
+			@PathVariable("pagSize") int pagSize,
+			HttpServletRequest request,HttpServletResponse response){
+		if(pagSize<5||pagSize>50){
+			pagSize=10;
+		}
+		PrintWriter out=null;
+		try {
+			out = response.getWriter();
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		List<UploadFace> list=uploadFaceService.getAllUploadFaceList();
+		JsonArray jsonArray = new JsonArray();
+		 for (UploadFace uploadFace : list) {
+			 JsonObject jo=new JsonObject();
+			 File thumbnail = generateThumbnail(uploadFace.getUploadimg(),false);
+			 jo.addProperty("thumbnailImgFileName",thumbnail==null?"":thumbnail.getName());
+			 jo.addProperty("imgFileiName",uploadFace.getUploadimg());//这个接口怎么用示范一下
+			 jo.addProperty("date",uploadFace.getUploaddate().toGMTString());//这个接口怎么用示范一下
+			 jsonArray.add(jo);
+		}
+         out.print(jsonArray.toString());
+	}
+	
+	
+	/**
+	 * 
+	 * @param srcFileName
+	 * @param coverOld
+	 * @return 
+	 * @throws IOException 
+	 */
+	private File generateThumbnail(String srcFileName,boolean coverOld){
+		
+		try {
+			String thumbnailSubffixWithDot=srcFileName .substring(srcFileName.lastIndexOf("."));
+			String thumbnailNameNoSubffix=srcFileName .substring(0,srcFileName.lastIndexOf("."))
+					+"_thumb";
+			String thumbnailName=thumbnailNameNoSubffix+thumbnailSubffixWithDot;
+			String rootPath = WebLocalPathUtil.getRootPath(this);
+			String thumbnailDirPath = rootPath+File.separator
+					+"uploadface"+File.separator
+					+"thumb"+File.separator;
+			File thumbnail= new File(thumbnailDirPath,thumbnailName);
+			boolean thumbnailExist =thumbnail.exists();
+			File srcFile = new File(rootPath+File.separator
+					+"uploadface"+File.separator+srcFileName);
+			if(thumbnailExist){
+				if(!coverOld){
+					return thumbnail;
+				}else{
+					ImageResizer.zoomImageScale(srcFile, thumbnailDirPath+thumbnailName, 100);
+				}
+			}else{
+				ImageResizer.zoomImageScale(srcFile, thumbnailDirPath+thumbnailName, 100);
+			}
+			
+			return thumbnail;
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return null;
+		
+	}
+	
+	
+	
 }

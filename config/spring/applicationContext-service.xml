@@ -12,6 +12,10 @@
 		http://www.springframework.org/schema/aop/spring-aop-3.2.xsd 
 		http://www.springframework.org/schema/tx 
 		http://www.springframework.org/schema/tx/spring-tx-3.2.xsd ">
-<!-- 商品管理的service -->
-<bean id="itemsService" class="com.face.service.impl.UsernifosServiceImpl"/>
+<!-- 用户信息的service -->
+<bean id="usernifosService" class="com.face.service.impl.UsernifosServiceImpl"/>
+<!-- 上传图片的service -->
+<bean id="uploadFaceService" class="com.face.service.impl.UploadFaceServiceImpl"/>
+<!-- 用户身份人脸图片的service -->
+<bean id="userfaceImgService" class="com.face.service.impl.UserfaceImgServiceImpl"/>
 </beans>

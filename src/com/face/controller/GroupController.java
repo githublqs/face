@@ -32,7 +32,8 @@ import com.wordnik.swagger.annotations.ApiParam;
 import com.wordnik.swagger.annotations.ApiResponse;
 import com.wordnik.swagger.annotations.ApiResponses;
 /**
- * Created by yuananyun on 2015/11/23.
+ * Created by lqs on 2015/11/23.
+ * 测试用的
  */
 @ApiIgnore
 @Controller
