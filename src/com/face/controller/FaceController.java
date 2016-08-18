@@ -2,6 +2,7 @@ package com.face.controller;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.face.po.PageInfo;
 import com.face.po.UploadFace;
 import com.face.protocol.entiy.FaceResultComputeTwoFeatureSimilarity;
 import com.face.protocol.entiy.FaceResultDet;
@@ -213,7 +215,7 @@ public class FaceController {
 		return new FaceResultComputeTwoFeatureSimilarity("000000000", -9,0.0f);
 	}
 
-	@ApiOperation(notes = "/uploadFaceList", httpMethod = "POST", value = "返回所有已经上传的图片集合")
+	/*@ApiOperation(notes = "/uploadFaceList", httpMethod = "POST", value = "返回所有已经上传的图片集合")
 	public void uploadFaceList(HttpServletRequest request,HttpServletResponse response){
 		PrintWriter out=null;
 		try {
@@ -222,9 +224,6 @@ public class FaceController {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
-		 /*private String thumbnailImgFileName;
-	     private String imgFileiName;
-	     private  String date;*/
 		List<UploadFace> list=uploadFaceService.getAllUploadFaceList();
 		JsonArray jsonArray = new JsonArray();
 		 for (UploadFace uploadFace : list) {
@@ -236,22 +235,23 @@ public class FaceController {
 			 jsonArray.add(jo);
 		}
          out.print(jsonArray.toString());
-	}
+	}*/
 	
-	
-	
-	
-	@ApiOperation(notes = "/uploadFaceList/{page}/{pagSize}", httpMethod = "POST", value = "分页返回已经上传的图片集合")
 	/*
 	 * 分页查询 todo 的
 	 */
+	@ApiOperation(notes = "/uploadFaceList", httpMethod = "POST", value = "分页返回已经上传的图片集合")
+	@RequestMapping(value="/uploadFaceList" ,method = RequestMethod.POST)
 	public void uploadFaceListByPage(
-			@PathVariable("page") int page,
-			@PathVariable("pagSize") int pagSize,
+			@RequestBody(required=true) PageInfo pageInfo,
 			HttpServletRequest request,HttpServletResponse response){
-		if(pagSize<5||pagSize>50){
-			pagSize=10;
+		if(pageInfo.getPageNo()<1){
+			pageInfo.setPageNo(1);
 		}
+		if(pageInfo.getPageSize()<1||pageInfo.getPageSize()>100){
+			pageInfo.setPageSize(10);
+		}
+		
 		PrintWriter out=null;
 		try {
 			out = response.getWriter();
@@ -259,20 +259,56 @@ public class FaceController {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
-		List<UploadFace> list=uploadFaceService.getAllUploadFaceList();
+		List<UploadFace> list=uploadFaceService.getAllUploadFaceListByPage(pageInfo.getPageNo(), pageInfo.getPageSize());
 		JsonArray jsonArray = new JsonArray();
+		 SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		  
 		 for (UploadFace uploadFace : list) {
 			 JsonObject jo=new JsonObject();
 			 File thumbnail = generateThumbnail(uploadFace.getUploadimg(),false);
 			 jo.addProperty("thumbnailImgFileName",thumbnail==null?"":thumbnail.getName());
+			 jo.addProperty("id",uploadFace.getId());
 			 jo.addProperty("imgFileiName",uploadFace.getUploadimg());//这个接口怎么用示范一下
-			 jo.addProperty("date",uploadFace.getUploaddate().toGMTString());//这个接口怎么用示范一下
+			 String dateString = formatter.format(uploadFace.getUploaddate());
+			 jo.addProperty("date",dateString);//这个接口怎么用示范一下
 			 jsonArray.add(jo);
 		}
-         out.print(jsonArray.toString());
+	      //得到数据的条数
+	      int rowCount =uploadFaceService.getAllUploadFaceCount();
+	      //通过计算，得到分页应该需要分几页，其中不满一页的数据按一页计算
+	      if(rowCount%pageInfo.getPageSize()!=0)
+	      {
+	        rowCount = rowCount / pageInfo.getPageSize() + 1;
+	      }
+	      else
+	      {
+	        rowCount = rowCount / pageInfo.getPageSize();
+	      }
+
+	      //转成Json格式
+	      String strResult = "{\"pageCount\":"+rowCount+",\"CurrentPage\":"+pageInfo.getPageNo()+
+	    		  ",\"list\":" +
+	    		  jsonArray.toString()
+	    		  + "}";
+	     
+	      out.print(strResult);
+         //out.print(jsonArray.toString());
 	}
 	
-	
+	/*@ApiOperation(notes = "/getUploadFaceSize", httpMethod = "GET", value = "获得已上传的图片数目")
+	@RequestMapping(value="/getUploadFaceSize" ,method = RequestMethod.GET)
+	public void getUploadFaceSize(HttpServletRequest request,HttpServletResponse response){
+		PrintWriter out=null;
+		try {
+			out = response.getWriter();
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		 JsonObject jo=new JsonObject();
+		 jo.addProperty("count",uploadFaceService.getAllUploadFaceCount());
+         out.print(jo.toString());
+	}*/
 	/**
 	 * 
 	 * @param srcFileName
@@ -281,7 +317,6 @@ public class FaceController {
 	 * @throws IOException 
 	 */
 	private File generateThumbnail(String srcFileName,boolean coverOld){
-		
 		try {
 			String thumbnailSubffixWithDot=srcFileName .substring(srcFileName.lastIndexOf("."));
 			String thumbnailNameNoSubffix=srcFileName .substring(0,srcFileName.lastIndexOf("."))
@@ -311,9 +346,5 @@ public class FaceController {
 			e.printStackTrace();
 		}
 		return null;
-		
 	}
-	
-	
-	
 }

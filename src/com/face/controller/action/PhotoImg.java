@@ -3,6 +3,7 @@ package com.face.controller.action;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
+import java.util.List;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.MultipartConfig;
@@ -42,26 +43,27 @@ public class PhotoImg  extends HttpServlet {
 		 SingleEncrypUtil singleEncrypUtil=new SingleEncrypUtil();
 		 Collection<Part> parts = request.getParts();
 		if(parts!=null){
+			List<Part> partsList=(List<Part>) parts;
 			
-			Part[] partsArray = (Part[])parts.toArray();
-			if(partsArray.length==1){
-				Part part=partsArray[0];
+			
+			if(partsList.size()==1){
+				Part part=partsList.get(0);
 				  //所用文件全部存为jpg格式
 			    String uploadImg= singleEncrypUtil.getHexString(singleEncrypUtil.getMD5Sole("加密字符串"))+".jpg";
 				part.write(path+File.separator+"uploadface"+File.separator+uploadImg);//uploadImg 文件夹不存在会报错
 				request.getRequestDispatcher("addUploadFace.action?uploadimg="+uploadImg).forward(request, response);//写入文件后写入到数据库中
 
 				
-			}else if(partsArray.length>1){
+			}else if(partsList.size()>1){
 				
 				
-				Part part=	 partsArray[0];
+				Part part=	partsList.get(0);
 				 String uploadImg0= singleEncrypUtil.getHexString(singleEncrypUtil.getMD5Sole("加密字符串"))+".jpg";
 				part.write(path+File.separator+"uploadface"+File.separator+uploadImg0);//uploadImg 文件夹不存在会报错
-				request.setAttribute("uploadimg0",uploadImg0 );
+				request.setAttribute("img0",uploadImg0 );
 					
 				
-				part=partsArray[1];
+				part=partsList.get(1);
 				  //所用文件全部存为jpg格式
 			    String uploadImg= singleEncrypUtil.getHexString(singleEncrypUtil.getMD5Sole("加密字符串"))+".jpg";
 				part.write(path+File.separator+"uploadface"+File.separator+uploadImg);//uploadImg 文件夹不存在会报错
@@ -74,7 +76,7 @@ public class PhotoImg  extends HttpServlet {
 			 if(part!=null){
 				 String uploadImg0= singleEncrypUtil.getHexString(singleEncrypUtil.getMD5Sole("加密字符串"))+".jpg";
 				part.write(path+File.separator+"uploadface"+File.separator+uploadImg0);//uploadImg 文件夹不存在会报错
-				request.setAttribute("uploadimg0",uploadImg0 );	 
+				request.setAttribute("img0",uploadImg0 );	 
 			 }
 			 
 				

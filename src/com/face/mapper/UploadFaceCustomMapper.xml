@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.face.mapper.UploadFaceCustomMapper" >
+  <resultMap id="BaseResultMap" type="com.face.po.UploadFace" >
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="uploadImg" property="uploadimg" jdbcType="VARCHAR" />
+    <result column="uploadDate" property="uploaddate" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <select id="selectByPage" resultMap="BaseResultMap"  >
+  	 SELECT t1.* FROM `uploadface` AS t1
+  	<choose> 
+  	  <when test="pageNo &lt; 1 or pageSize &lt; 1 or pageSize  &gt; 100" >  
+     	where 1=2                
+      </when> 
+      <otherwise>
+      JOIN (SELECT id FROM `uploadface` ORDER BY id desc LIMIT #{temp}, 1) AS t2   
+		WHERE t1.id &lt;= t2.id ORDER BY t1.id desc LIMIT #{pageSize}
+      </otherwise>
+      </choose>       
+  </select>
+    <select id="getUploadFaceSize" resultType="java.lang.Integer"  >
+  	 SELECT count(*) FROM `uploadface`
+  </select>
+  
+</mapper>
+
+
+
+

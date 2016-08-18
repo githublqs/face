@@ -28,6 +28,7 @@ public class UsernifosServiceImpl implements UsernifosService{
 	}
 	@Override
 	public boolean userRegisted(Userinfo userinfo) {
+		
 		return userinfoMapper.selectByPrimaryKey(userinfo.getUsername())!=null;
 	}
 	@Override
@@ -47,6 +48,8 @@ public class UsernifosServiceImpl implements UsernifosService{
 			userfaceImg.setFaceimg(userinfoCustom.getFaceimg());
 			userfaceImg.setUsername(userinfoCustom.getUsername());
 			userfaceImgMapper.insert(userfaceImg);
+			
+			
 			return true;
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -65,7 +68,6 @@ public class UsernifosServiceImpl implements UsernifosService{
 	@Override
 	public UserinfoCustom getUserinfoCustom(Userinfo userinfo) {
 		UserfaceImg userfaceImg = getUserfaceImg(userinfo);
-		new UserinfoCustom(userfaceImg==null?0:userfaceImg.getId(), userfaceImg.getFaceimg(), userinfo.getUsername(), userinfo.getPassword(), userinfo.getNickname(), userinfo.getGender());
-		return null;
+		return new UserinfoCustom(userfaceImg==null?0:userfaceImg.getId(), userfaceImg==null?null:userfaceImg.getFaceimg(), userinfo.getUsername(), userinfo.getPassword(), userinfo.getNickname(), userinfo.getGender());
 	}
 }

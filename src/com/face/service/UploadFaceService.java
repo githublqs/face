@@ -9,5 +9,7 @@ import com.face.po.UploadFace;
 public interface UploadFaceService {
 	public int addUploadFace(UploadFace uploadFace);
 	public List<UploadFace> getAllUploadFaceList();
+	public List<UploadFace> getAllUploadFaceListByPage(int pageNo,int pageSize);
+	public int getAllUploadFaceCount();
 	
 }

@@ -49,11 +49,12 @@ public String addUploadFace(@ModelAttribute(value="uploadFace")UploadFace upload
 	PrintWriter out= response.getWriter();
 	//每次都是用默认用户 作用:屏蔽用户功能 适配原有的数据库表接口，保证现在的代码逻辑可以每次对比了账新上传的图片，并将图片相关信息写入数据库中
 	Map<String, Object> resultMap=new HashMap<String, Object>();
-	resultMap.put("username", "小明");
+	resultMap.put("username", "lqs");
 	resultMap.put("matching", "yes");//这个接口怎么用示范一下
 	resultMap.put("similarity", 1.0f);//这个接口怎么用示范一下
 	resultMap.put("errorcode",0);//这个接口怎么用示范一下
 	Gson gson=new Gson();
+	uploadFace.setId(new Long(0));
 	uploadFaceService.addUploadFace(uploadFace);
 	Userinfo userinfo = new Userinfo();
 	userinfo.setUsername( "lqs");
@@ -68,7 +69,7 @@ public String addUploadFace(@ModelAttribute(value="uploadFace")UploadFace upload
 			
 		}else{
 			//如果用户没有注册
-			usernifosService.saveUserInfo(userinfoCustom);
+			
 			String img0=(String)request.getAttribute("img0");
 			userinfoCustom=new UserinfoCustom(
 					new Long(0), 
@@ -77,6 +78,7 @@ public String addUploadFace(@ModelAttribute(value="uploadFace")UploadFace upload
 					userinfo.getPassword(), 
 					userinfo.getNickname(),
 					userinfo.getGender());
+			usernifosService.saveUserInfo(userinfoCustom);
 		}
 	}else{
 		if(usernifosService.userRegisted(userinfo)){
@@ -139,8 +141,5 @@ public String addUploadFace(@ModelAttribute(value="uploadFace")UploadFace upload
 	}
 	return null;
 }
-//接下来准备完成
-//展示用户列表信息
-//展示上传文件列表信息
-//......
+
 }
