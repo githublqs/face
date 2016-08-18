@@ -73,6 +73,7 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
                 case "page":
                   return page;
               }
+              
             },//点击事件，用于通过Ajax来刷新整个list列表
             onPageClicked: function (event, originalEvent, type, page) {
               $.ajax({

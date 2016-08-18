@@ -39,7 +39,10 @@ public class PhotoImg  extends HttpServlet {
 		
 */		
 		String path=WebLocalPathUtil.getRootPath(this);
-		
+		File parent=new File(path+File.separator+"uploadface"+File.separator).getParentFile();
+		if(!parent.exists()){
+			parent.mkdirs();	
+		}
 		 SingleEncrypUtil singleEncrypUtil=new SingleEncrypUtil();
 		 Collection<Part> parts = request.getParts();
 		if(parts!=null){

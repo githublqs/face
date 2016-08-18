@@ -262,10 +262,17 @@ public class FaceController {
 		List<UploadFace> list=uploadFaceService.getAllUploadFaceListByPage(pageInfo.getPageNo(), pageInfo.getPageSize());
 		JsonArray jsonArray = new JsonArray();
 		 SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-		  
+		String rootPath = WebLocalPathUtil.getRootPath(this);
+		String thumbnailDirPath = rootPath+File.separator
+				+"uploadface"+File.separator
+				+"thumb"+File.separator;	
+		File thumbnailDir=new File(thumbnailDirPath);
+		if(!thumbnailDir.exists()){
+			thumbnailDir.mkdirs();
+		}
 		 for (UploadFace uploadFace : list) {
 			 JsonObject jo=new JsonObject();
-			 File thumbnail = generateThumbnail(uploadFace.getUploadimg(),false);
+			 File thumbnail = generateThumbnail(rootPath,thumbnailDir,uploadFace.getUploadimg(),false);
 			 jo.addProperty("thumbnailImgFileName",thumbnail==null?"":thumbnail.getName());
 			 jo.addProperty("id",uploadFace.getId());
 			 jo.addProperty("imgFileiName",uploadFace.getUploadimg());//这个接口怎么用示范一下
@@ -316,28 +323,25 @@ public class FaceController {
 	 * @return 
 	 * @throws IOException 
 	 */
-	private File generateThumbnail(String srcFileName,boolean coverOld){
+	private File generateThumbnail(String rootPath,File thumbnailDir,String srcFileName,boolean coverOld){
 		try {
 			String thumbnailSubffixWithDot=srcFileName .substring(srcFileName.lastIndexOf("."));
 			String thumbnailNameNoSubffix=srcFileName .substring(0,srcFileName.lastIndexOf("."))
 					+"_thumb";
 			String thumbnailName=thumbnailNameNoSubffix+thumbnailSubffixWithDot;
-			String rootPath = WebLocalPathUtil.getRootPath(this);
-			String thumbnailDirPath = rootPath+File.separator
-					+"uploadface"+File.separator
-					+"thumb"+File.separator;
-			File thumbnail= new File(thumbnailDirPath,thumbnailName);
+			File thumbnail= new File(thumbnailDir,thumbnailName);
 			boolean thumbnailExist =thumbnail.exists();
 			File srcFile = new File(rootPath+File.separator
 					+"uploadface"+File.separator+srcFileName);
+			
 			if(thumbnailExist){
 				if(!coverOld){
 					return thumbnail;
 				}else{
-					ImageResizer.zoomImageScale(srcFile, thumbnailDirPath+thumbnailName, 100);
+					ImageResizer.zoomImageScale(srcFile, thumbnail.getAbsolutePath(), 100);
 				}
 			}else{
-				ImageResizer.zoomImageScale(srcFile, thumbnailDirPath+thumbnailName, 100);
+				ImageResizer.zoomImageScale(srcFile, thumbnail.getAbsolutePath(), 100);
 			}
 			
 			return thumbnail;
