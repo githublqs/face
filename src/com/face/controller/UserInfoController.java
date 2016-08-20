@@ -78,7 +78,7 @@ public class UserInfoController {
 	//@RequestMapping(value={"/index", "/hello"}, method = {RequestMethod.GET})
 	//以上表示的就是可以处理index.action和hello.action的路径。
 	
-	@RequestMapping(value="/login",method = {RequestMethod.POST})
+	@RequestMapping(value="/userLogin2",method = {RequestMethod.POST})
 	public ModelAndView userLogin(/*@RequestParam(value="aa1", required=true) aa,*/  Userinfo userInfo/*,HttpServletRequest request*/){
 		List<Userinfo> userInfoList=new ArrayList<Userinfo>();
 		ModelAndView modelAndView=new ModelAndView();
@@ -135,13 +135,13 @@ public class UserInfoController {
 					  //用户未登陆，且已经注册过，session保存此次登陆结果
 					   request.getSession().setAttribute(Constant.USERNAME_KEY, userinfo.getUsername());
 					   //存储id信息，如果存在
-					   UserfaceImg userfaceImg=usernifosService.getUserfaceImg(userinfo);
+					  /* UserfaceImg userfaceImg=usernifosService.getUserfaceImg(userinfo);
 					   if(userfaceImg!=null){
 						   request.getSession().setAttribute(Constant.ID_KEY, userfaceImg.getId());
-					   }
+					   }*/
 					   resultMap.put("username",userinfo.getUsername());
-						resultMap.put("loginSuccess",true);//这个接口怎么用示范一下
-						resultMap.put("errorcode",0);//这个接口怎么用示范一下
+					   resultMap.put("loginSuccess",true);//这个接口怎么用示范一下
+					   resultMap.put("errorcode",0);//这个接口怎么用示范一下
 					  
 				  }else{
 					  //用户没有注册
@@ -225,5 +225,12 @@ public class UserInfoController {
 		 resultMap.put("errorcode",0);//这个接口怎么用示范一下
          out.print(gson.toJson(resultMap));
 	}
-	
+	@RequestMapping(value="/Login",method = {RequestMethod.GET})
+	public String Login(){
+		return "userinfos/Login";
+	}
+	@RequestMapping(value="/Register",method = {RequestMethod.GET})
+	public String Register(){
+		return "userinfos/Register";
+	}
 }

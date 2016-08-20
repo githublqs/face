@@ -1,4 +1,4 @@
-package com.face.action;
+ package com.face.action;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -40,7 +40,7 @@ public class test {
 		byte []s=getBytes(path1);
 		int reval=faceLib.DetectDTFace(s, s.length, sd1, iNum1); 
 		if(iNum1[0]==0){
-			System.out.println("iNum1ц╩спаЁ");
+			System.out.println("iNum1ц╩О©╫О©╫О©╫О©╫");
 			return 0.0f;
 		}
 		int dd=	faceLib.ExtractFaceFeatureFromFile(path1,sd1,featureByte1,feature1);
@@ -49,7 +49,7 @@ public class test {
 		byte []s=getBytes(path2);
 		int returnval=faceLib.DetectDTFace(s, s.length, sd2, iNum2); 
 		if(iNum2[0]==0){
-			System.out.println("iNum2ц╩спаЁ");
+			System.out.println("iNum2ц╩О©╫О©╫О©╫О©╫");
 			return 0.0f;
 		}
 		int dd=	faceLib.ExtractFaceFeatureFromFile(path2,sd2,featureByte2,feature2);
@@ -61,7 +61,8 @@ public class test {
 	}
 	public static void main(String[] args) {
 	System.out.println("123");
-	System.out.println(compareFace("C:\\Users\\luhui\\Desktop\\20160115131636824_3.jpg","C:\\Users\\luhui\\Desktop\\20160115131636706_10.jpg"));	
+	System.out.println(compareFace("C:\\Users\\luhui\\Desktop\\20160115131636824_3.jpg",
+			"C:\\Users\\luhui\\Desktop\\20160115131636706_10.jpg"));	
 	}
 	  public static byte[] getBytes(String filePath){  
 	        byte[] buffer = null;  

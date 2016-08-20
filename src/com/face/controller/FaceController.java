@@ -245,6 +245,7 @@ public class FaceController {
 	public void uploadFaceListByPage(
 			@RequestBody(required=true) PageInfo pageInfo,
 			HttpServletRequest request,HttpServletResponse response){
+		boolean isRetListDirect=pageInfo.isRetListDirect();
 		if(pageInfo.getPageNo()<1){
 			pageInfo.setPageNo(1);
 		}
@@ -280,6 +281,10 @@ public class FaceController {
 			 jo.addProperty("date",dateString);//这个接口怎么用示范一下
 			 jsonArray.add(jo);
 		}
+		 if(isRetListDirect){
+			 out.print(jsonArray.toString());
+			 return;
+		 }
 	      //得到数据的条数
 	      int rowCount =uploadFaceService.getAllUploadFaceCount();
 	      //通过计算，得到分页应该需要分几页，其中不满一页的数据按一页计算
@@ -291,7 +296,7 @@ public class FaceController {
 	      {
 	        rowCount = rowCount / pageInfo.getPageSize();
 	      }
-
+	      
 	      //转成Json格式
 	      String strResult = "{\"pageCount\":"+rowCount+",\"CurrentPage\":"+pageInfo.getPageNo()+
 	    		  ",\"list\":" +
@@ -302,7 +307,7 @@ public class FaceController {
          //out.print(jsonArray.toString());
 	}
 	
-	/*@ApiOperation(notes = "/getUploadFaceSize", httpMethod = "GET", value = "获得已上传的图片数目")
+	@ApiOperation(notes = "/getUploadFaceSize", httpMethod = "GET", value = "获得已上传的图片数目")
 	@RequestMapping(value="/getUploadFaceSize" ,method = RequestMethod.GET)
 	public void getUploadFaceSize(HttpServletRequest request,HttpServletResponse response){
 		PrintWriter out=null;
@@ -315,7 +320,7 @@ public class FaceController {
 		 JsonObject jo=new JsonObject();
 		 jo.addProperty("count",uploadFaceService.getAllUploadFaceCount());
          out.print(jo.toString());
-	}*/
+	}
 	/**
 	 * 
 	 * @param srcFileName
@@ -350,5 +355,12 @@ public class FaceController {
 			e.printStackTrace();
 		}
 		return null;
+	}
+	
+	@RequestMapping(value="/uploadFaceManage" ,method = RequestMethod.GET)
+	public String uploadFaceManage() throws Exception{
+			//throw new Exception("异常测试");	
+		return "faceRec/uploadFaceManage";
+		
 	}
 }

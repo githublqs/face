@@ -9,13 +9,14 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
   <head>
     <base href="<%=basePath%>">
     <title>My JSP 'uploadFaceList.jsp' starting page</title>
-	
     <link rel="stylesheet" href="css/bootstrap-responsive.css">
     <link rel="stylesheet" href="css/bootstrap.css">
     <link rel="stylesheet" href="css/qunit-1.11.0.css">
     <script src="js/jquery-1.9.1.min.js" type="text/javascript"></script>
-
-
+    
+    <script type="text/javascript" src="js/jquery.lightbox.js"></script>
+	<link rel="stylesheet" href="css/lightbox.css" type="text/css" media="screen" />
+    
   </head>
   
   <body>
@@ -24,97 +25,89 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
   
   <script>
   $(function () {
-    $.ajax({
-      url: "faceRec/uploadFaceList",
-      datatype: 'json',
-      type: "post",
-       contentType: "application/json; charset=utf-8",
-       data:JSON.stringify({                  
-				    "pageNo":1,"pageSize":20
-				}),
-      success: function (data) {
-        if (data != null) {
-         $("#list").empty();  
-         $("#list").append('<table id="data_table" class="table table-striped">');
-          $("#list").append('<thead>');
-          $("#list").append('<tr>');
-          $("#list").append('<th>Id</th>');
-          $("#list").append('<th>缩略图</th>');
-          $("#list").append('<th>日期</th>');
-          $("#list").append('</tr>');
-          $("#list").append('</thead>');
-          $("#list").append('<tbody>');
-          $.each(eval("(" + data + ")").list, function (index, item) { //遍历返回的json
-            $("#list").append('<tr>');
-            $("#list").append('<td>' + item.id + '</td>');
-           /*  $("#list").append('<td>' + item.thumbnailImgFileName + '</td>'); */
-           $("#list").append("<td><img width=100 height=100 src=\"uploadface/thumb/"+item.thumbnailImgFileName+"\"  alt=\""+item.thumbnailImgFileName+"\" /></td>");
-           $("#list").append('<td>'+item.date+'</td>');
-            $("#list").append('</tr>');
-          });
-           $("#list").append('</tbody>');
-           $("#list").append('</table>');
-          var pageCount = eval("(" + data + ")").pageCount; //取到pageCount的值(把返回数据转成object类型)
-          var currentPage = eval("(" + data + ")").CurrentPage; //得到urrentPage
-          var options = {
-            bootstrapMajorVersion: 2, //版本
-            currentPage: currentPage, //当前页数
-            totalPages: pageCount, //总页数
-            itemTexts: function (type, page, current) {
-              switch (type) {
-                case "first":
-                  return "首页";
-                case "prev":
-                  return "上一页";
-                case "next":
-                  return "下一页";
-                case "last":
-                  return "末页";
-                case "page":
-                  return page;
-              }
-              
-            },//点击事件，用于通过Ajax来刷新整个list列表
-            onPageClicked: function (event, originalEvent, type, page) {
-              $.ajax({
-                //url: "/OA/Setting/GetDate?id=" + page,
-                url: "faceRec/uploadFaceList",
-                type: "post",
-                datatype: 'json',
-                contentType: "application/json; charset=utf-8",
-                data:JSON.stringify({                  
-				    "pageNo":page,"pageSize":20
-				}),
-                success: function (data1) {
-                  if (data1 != null) {
-                  $("#list").empty();  
-                  $("#list").append('<table id="data_table" class="table table-striped">');
-		          $("#list").append('<thead>');
-		          $("#list").append('<tr>');
-		          $("#list").append('<th>Id</th>');
-		          $("#list").append('<th>缩略图</th>');
-		          $("#list").append('<th>日期</th>');
-		          $("#list").append('</tr>');
-		          $("#list").append('</thead>');
-		          $("#list").append('<tbody>');
-                    $.each(eval("(" + data1 + ")").list, function (index, item) { //遍历返回的json
-                       $("#list").append('<tr>');
-			            $("#list").append('<td>' + item.id + '</td>');
-			            $("#list").append("<td><img width=100 height=100 src=\"uploadface/thumb/"+item.thumbnailImgFileName+"\"  alt=\""+item.thumbnailImgFileName+"\" /></td>");
-			            $("#list").append('<td>'+item.date+'</td>');
-			            $("#list").append('</tr>');
-                    });
-                    $("#list").append('</tbody>');
-                    $("#list").append('</table>');
-                  }
-                }
-              });
-            }
-          };
-          $('#example').bootstrapPaginator(options);
-        }
-      }
-    });
+	function getUploadFaceSize(){
+		 $.ajax({
+		      url: "faceRec/getUploadFaceSize",
+		      type: "get",
+		      dataType:"json",
+			 success: function (data) {
+			 	$("#lbl_uploadFaceList").html("上传照片("+data.count+")");
+			 }
+			});
+	}
+	var pageSize=20;
+	function getUploadFaceList(pageNo,pageSize){
+		$.ajax({
+	      url: "faceRec/uploadFaceList",
+	      datatype: 'json',
+	      type: "post",
+	       contentType: "application/json; charset=utf-8",
+	       data:JSON.stringify({                  
+					    "pageNo":pageNo,"pageSize":pageSize
+					}),
+	      success: function (data) {
+	        if (data != null) {
+	        getUploadFaceSize();
+	         $("#list").empty();  
+	         $("#list").append('<table id="data_table" class="table table-striped">');
+	          $("#list").append('<thead>');
+	          $("#list").append('<tr>');
+	          $("#list").append('<th>Id</th>');
+	          $("#list").append('<th>缩略图</th>');
+	          $("#list").append('<th>日期</th>');
+	          $("#list").append('</tr>');
+	          $("#list").append('</thead>');
+	          $("#list").append('<tbody>');
+	          $.each(eval("(" + data + ")").list, function (index, item) { //遍历返回的json
+	            $("#list").append('<tr>');
+	            $("#list").append('<td>' + item.id + '</td>');
+	           $("#list").append(
+	           		"<td>"+
+	            	"<a class=\"lightbox\" title=\"\" href=\"uploadface/"+item.imgFileiName+"\" alt=\"\" >"+
+	            	"<img width=100 height=100 src=\"uploadface/thumb/"+item.thumbnailImgFileName+"\"  alt=\""+item.thumbnailImgFileName+"\" />"+
+	            	"</a>"+
+	            	"</td>"
+	           ); 
+	           //$("#list").append("<td><img width=100 height=100 src=\"uploadface/thumb/"+item.thumbnailImgFileName+"\"  alt=\""+item.thumbnailImgFileName+"\" /></td>");
+	           
+	           $("#list").append('<td>'+item.date+'</td>');
+	            $("#list").append('</tr>');
+	          });
+	          
+	           $("#list").append('</tbody>');
+	           $("#list").append('</table>');
+	           $("a.lightbox").lightbox();
+	          var pageCount = eval("(" + data + ")").pageCount; //取到pageCount的值(把返回数据转成object类型)
+	          var currentPage = eval("(" + data + ")").CurrentPage; //得到urrentPage
+	          var options = {
+	            bootstrapMajorVersion: 2, //版本
+	            currentPage: currentPage, //当前页数
+	            totalPages: pageCount, //总页数
+	            itemTexts: function (type, page, current) {
+	              switch (type) {
+	                case "first":
+	                  return "首页";
+	                case "prev":
+	                  return "上一页";
+	                case "next":
+	                  return "下一页";
+	                case "last":
+	                  return "末页";
+	                case "page":
+	                  return page;
+	              }
+	              
+	            },//点击事件，用于通过Ajax来刷新整个list列表
+	            onPageClicked: function (event, originalEvent, type, page) {
+	            	getUploadFaceList(page,pageSize);
+	            }
+	          };
+	          $('#example').bootstrapPaginator(options);
+	        }
+	      }
+	    });
+	}
+	getUploadFaceList(1,pageSize);
     	var videoPrepared=false;
        //初始化变量
             var context = document.getElementById("canvas").getContext("2d");
@@ -154,7 +147,6 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 			                           if(dataObj){
 			                           			if(dataObj.errorcode==0){
 			                           				if(dataObj.face_num>0){
-			                           				
 			                           					for (var i=0;i<dataObj.face_rect.length;i++)
 														{
 															var face_rect_obj= dataObj.face_rect[i];
@@ -239,6 +231,8 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
                             else {
                             alert("相似度不够高");
                             }
+							getUploadFaceList(1,pageSize);
+								
                         },
                         error: function () {
                             alert("很抱歉，传递数据到服务器出错，这是服务器的原因，所以您可以等待，过段时间，获联系负责人");
@@ -251,7 +245,7 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
   });
 </script>
     <div>
-        <label>上传照片列表</label>
+        <label id ="lbl_uploadFaceList" ></label>
        
         <div id="list"></div>
 
