@@ -1,12 +1,18 @@
 package com.face.controller;
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.Part;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -16,21 +22,27 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
+
 import com.face.config.Constant;
 import com.face.po.UserfaceImg;
 import com.face.po.Userinfo;
 import com.face.po.UserinfoCustom;
 import com.face.service.UsernifosService;
+import com.face.util.FileUtil;
+import com.face.util.SingleEncrypUtil;
+import com.face.util.WebLocalPathUtil;
 import com.google.gson.Gson;
 import com.mangofactory.swagger.annotations.ApiIgnore;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiModel;
+import com.wordnik.swagger.annotations.ApiOperation;
+@Api(value = "/userinfos", description = "用户管理")
 @Controller
 @RequestMapping("/userinfos")
-@ApiIgnore
 public class UserInfoController {
 	@Autowired
 	private UsernifosService usernifosService;
+	@ApiIgnore
 	@RequestMapping("/queryUserInfos")
 	public ModelAndView queryUserInfos(){
 		List<Userinfo> userInfoList=null;
@@ -45,7 +57,7 @@ public class UserInfoController {
 		modelAndView.setViewName("userinfos/userInfoList");
 		return modelAndView;
 	}
-	
+	@ApiIgnore
 	//测试json
 	@RequestMapping("/queryUserInfosOutJson/{un}/{pd}")
 	public @ResponseBody  List<Userinfo> queryUserInfosOutJson(
@@ -60,6 +72,7 @@ public class UserInfoController {
 		userInfoList.add(userInfo2);
 		return userInfoList;
 	}
+	@ApiIgnore
 	//测试输出json
 	@RequestMapping("/queryUserInfosOnlyOutJson/{un}/{pd}")
 	public @ResponseBody  List<Userinfo> queryUserInfosOnlyOutJson(
@@ -77,7 +90,7 @@ public class UserInfoController {
 	}
 	//@RequestMapping(value={"/index", "/hello"}, method = {RequestMethod.GET})
 	//以上表示的就是可以处理index.action和hello.action的路径。
-	
+	@ApiIgnore
 	@RequestMapping(value="/userLogin2",method = {RequestMethod.POST})
 	public ModelAndView userLogin(/*@RequestParam(value="aa1", required=true) aa,*/  Userinfo userInfo/*,HttpServletRequest request*/){
 		List<Userinfo> userInfoList=new ArrayList<Userinfo>();
@@ -117,7 +130,7 @@ public class UserInfoController {
 	
 	
 	
-	
+	@ApiIgnore
 	@RequestMapping(value="/userLogin",method = {RequestMethod.POST})
 	public void userLoin(@RequestBody Userinfo userinfo,HttpServletRequest request,HttpServletResponse response){
 		PrintWriter out=null;
@@ -167,8 +180,7 @@ public class UserInfoController {
 	     }
 		 out.print(gson.toJson(resultMap));
 	}
-	
-	
+	@ApiOperation(notes = "userRegister", httpMethod = "POST", value = "用户注册")
 	@RequestMapping(value="/userRegister",method = {RequestMethod.POST})
 	public void userRegister(@RequestBody UserinfoCustom userinfoCustom,HttpServletResponse response){
 		PrintWriter out=null;
@@ -178,9 +190,26 @@ public class UserInfoController {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
+		//保存图片
+		String path=WebLocalPathUtil.getRootPath(this);
+		File parent=new File(path+File.separator+"uploadface"+File.separator);
+		if(!parent.exists()){
+			parent.mkdirs();	
+		}
+		 SingleEncrypUtil singleEncrypUtil=new SingleEncrypUtil();
+		 String uploadImg= singleEncrypUtil.getHexString(singleEncrypUtil.getMD5Sole("加密字符串"))+".jpg";
+		 File storeFile = new File(parent,uploadImg);
+		 try {
+			FileUtil.saveFile(userinfoCustom.getFaceimg(),storeFile );
+		} catch (FileNotFoundException e1) {
+			e1.printStackTrace();
+		}
+		userinfoCustom.setFaceimg(uploadImg);
+		 
 		Map<String, Object> resultMap=new HashMap<String, Object>();
 		Gson gson=new Gson();
 		 try {  
+			
 			   if(!usernifosService.userRegisted(userinfoCustom)){
 				   
 				   if(usernifosService.saveUserInfo(userinfoCustom)){
@@ -190,6 +219,7 @@ public class UserInfoController {
 				   }else{
 					   resultMap.put("username",userinfoCustom.getUsername());
 					   resultMap.put("registerSuccess",false);//这个接口怎么用示范一下
+		
 					   resultMap.put("errorcode",2);//
 				   }
 			   }else{
@@ -207,7 +237,7 @@ public class UserInfoController {
 	        }  
 		 
 	}
-	
+	@ApiIgnore
 	@RequestMapping(value="/checkRegisted",method = {RequestMethod.POST})
 	public void checkRegisted(@RequestBody Userinfo userinfo,HttpServletResponse response){
 		PrintWriter out=null;
@@ -225,10 +255,12 @@ public class UserInfoController {
 		 resultMap.put("errorcode",0);//这个接口怎么用示范一下
          out.print(gson.toJson(resultMap));
 	}
+	@ApiIgnore
 	@RequestMapping(value="/Login",method = {RequestMethod.GET})
 	public String Login(){
 		return "userinfos/Login";
 	}
+	@ApiIgnore
 	@RequestMapping(value="/Register",method = {RequestMethod.GET})
 	public String Register(){
 		return "userinfos/Register";

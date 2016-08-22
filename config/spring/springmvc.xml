@@ -54,30 +54,29 @@
 	 
 	 
 	 
-	 
 	<!--  。。。。。。。。。。。。。。。。。。。。。。。。。。start。。。。。。。。。。。。。。。。。。。。。。。。。。 -->
-	<!-- <mvc:annotation-driven ></mvc:annotation-driven> -->
+	<mvc:annotation-driven ></mvc:annotation-driven>
 	<!-- 配置路径扩展名映射的媒体类型 -->
-	<bean name="pathExtensionContentNegotiationStrategy"
+	<!-- <bean name="pathExtensionContentNegotiationStrategy"
 		class="org.springframework.web.accept.PathExtensionContentNegotiationStrategy">
 		<constructor-arg>
-			<props>
+			<props> -->
 				<!-- if romePresent -->
-				<prop key="atom">application/atom+xml</prop>
-				<prop key="rss">application/rss+xml</prop>
+			<!-- 	<prop key="atom">application/atom+xml</prop>
+				<prop key="rss">application/rss+xml</prop> -->
 				<!-- endif -->
 				<!-- if jackson2Present || jacksonPresent -->
-				<prop key="json">application/json</prop>
+		<!-- 		<prop key="json">application/json</prop> -->
 				<!-- endif -->
 				<!-- if jaxb2Present -->
-				<prop key="xml">application/xml</prop>
+				<!-- <prop key="xml">application/xml</prop> -->
 				<!-- endif -->
-			</props>
+		<!-- 	</props>
 		</constructor-arg>
-	</bean>
+	</bean> -->
 
 	<!-- 配置映射媒体类型的策略 -->
-	<bean name="mvcContentNegotiationManager"
+<!-- 	<bean name="mvcContentNegotiationManager"
 		class="org.springframework.web.accept.ContentNegotiationManager">
 		<constructor-arg>
 			<list>
@@ -85,16 +84,16 @@
 			</list>
 		</constructor-arg>
 	</bean>
-
+ -->
 	<!-- 配置方法级别的@RequestMapping处理器 -->
-	<bean name="requestMappingHandlerMapping"
+<!-- 	<bean name="requestMappingHandlerMapping"
 		class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping">
 		<property name="order" value="0" />
 		<property name="contentNegotiationManager" ref="mvcContentNegotiationManager" />
 	</bean>
-
+ -->
 	<!-- 配置数据转换服务，默认使用格式化数据转换服务，可以对日期和数字进行格式化 -->
-	<bean name="conversionService"
+	<!-- <bean name="conversionService"
 		class="org.springframework.format.support.DefaultFormattingConversionService">
 		<constructor-arg index="0">
 			<null></null>
@@ -106,9 +105,9 @@
 
 	<bean name="validator"
 		class="org.springframework.validation.beanvalidation.LocalValidatorFactoryBean"></bean>
-
+ -->
 	<!-- 配置数据绑定，通过转换服务实现绑定，如果包含jsr303实现还将进行校验 -->
-	<bean name="webBindingInitializer"
+	<!-- <bean name="webBindingInitializer"
 		class="org.springframework.web.bind.support.ConfigurableWebBindingInitializer">
 		<property name="conversionService" ref="conversionService" />
 		
@@ -138,48 +137,48 @@
 		class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter"></bean>
 	<bean name="mappingJacksonHttpMessageConverter"
 		class="org.springframework.http.converter.json.MappingJacksonHttpMessageConverter"></bean>
-
+ -->
 	<!-- 配置@RequestBody，@ResponseBody注解可用的转换器 -->
-	<util:list id="messageConverters"
+	<!-- <util:list id="messageConverters"
 		list-class="org.springframework.beans.factory.support.ManagedList">
 		<ref bean="byteArrayHttpMessageConverter" />
 		<ref bean="stringHttpMessageConverter" />
 		<ref bean="resourceHttpMessageConverter" />
 		<ref bean="sourceHttpMessageConverter" />
-		<ref bean="allEncompassingFormHttpMessageConverter" />
+		<ref bean="allEncompassingFormHttpMessageConverter" /> -->
 		<!-- if romePresent -->
-		<ref bean="atomFeedHttpMessageConverter" />
-		<ref bean="rssChannelHttpMessageConverter" />
+		<!-- <ref bean="atomFeedHttpMessageConverter" /> -->
+		<!-- <ref bean="rssChannelHttpMessageConverter" /> -->
 		<!-- endif -->
 		<!-- if jaxb2Present -->
-		<ref bean="jaxb2RootElementHttpMessageConverter" />
+		<!-- <ref bean="jaxb2RootElementHttpMessageConverter" /> -->
 		<!-- endif -->
 		<!-- if jackson2Present -->
-		<ref bean="mappingJackson2HttpMessageConverter" />
+		<!-- <ref bean="mappingJackson2HttpMessageConverter" /> -->
 		<!-- endif -->
 		<!-- if jacksonPresent -->
-		<ref bean="mappingJacksonHttpMessageConverter" />
+		<!-- <ref bean="mappingJacksonHttpMessageConverter" /> -->
 		<!-- endif -->
-	</util:list>
+	<!-- </util:list> -->
 
 	<!-- 将任意类型的Controller适配为Handler -->
-	<bean name="requestMappingHandlerAdapter"
+	<!-- <bean name="requestMappingHandlerAdapter"
 		class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter">
 		<property name="contentNegotiationManager" ref="mvcContentNegotiationManager" />
 		<property name="webBindingInitializer" ref="webBindingInitializer" />
 		<property name="messageConverters" ref="messageConverters" />
 	</bean>
-
+ -->
 	<!-- 这个拦截器暴露转换器服务让spring:bind和spring:eval标签可用 -->
-	<bean name="csInterceptor"
+	<!-- <bean name="csInterceptor"
 		class="org.springframework.web.servlet.handler.ConversionServiceExposingInterceptor">
 		<constructor-arg index="0">
 			<ref bean="conversionService" />
 		</constructor-arg>
-	</bean>
+	</bean> -->
 
 	<!-- 现在所有拦截器都必须设定响应的路径映射 -->
-	<bean name="mappedCsInterceptor"
+	<!-- <bean name="mappedCsInterceptor"
 		class="org.springframework.web.servlet.handler.MappedInterceptor">
 		<constructor-arg index="0">
 			<null></null>
@@ -187,27 +186,27 @@
 		<constructor-arg index="1">
 			<ref bean="csInterceptor" />
 		</constructor-arg>
-	</bean>
+	</bean> -->
 
 	<!-- 使用@ExceptionHandler注解的方法来处理Exception，优先级为0（最高） -->
-	<bean name="exceptionHandlerExceptionResolver"
+	<!-- <bean name="exceptionHandlerExceptionResolver"
 		class="org.springframework.web.servlet.mvc.method.annotation.ExceptionHandlerExceptionResolver">
 		<property name="contentNegotiationManager" ref="mvcContentNegotiationManager" />
 		<property name="messageConverters" ref="messageConverters" />
 		<property name="order" value="0" />
-	</bean>
+	</bean> -->
 
 	<!-- 如果抛出的Exception类带有@ResponseStatus注解，响应返回该注解的Http状态码，优先级为1 -->
-	<bean name="responseStatusExceptionResolver"
+	<!-- <bean name="responseStatusExceptionResolver"
 		class="org.springframework.web.servlet.mvc.annotation.ResponseStatusExceptionResolver">
 		<property name="order" value="1" />
-	</bean>
+	</bean> -->
 
 	<!-- SpringMvc内部异常处理 -->
-	<bean name="defaultExceptionResolver"
+	<!-- <bean name="defaultExceptionResolver"
 		class="org.springframework.web.servlet.mvc.support.DefaultHandlerExceptionResolver">
 		<property name="order" value="2" />
-	</bean>
+	</bean> -->
 	<!--  。。。。。。。。。。。。。。。。。。。。。。。。。。end。。。。。。。。。。。。。。。。。。。。。。。。。。 -->
 	
 	
@@ -224,12 +223,12 @@
         </props>
       </property>
         
-       <property name="statusCodes">     
+      <!--  <property name="statusCodes">     
          <props>     
              <prop key="errors/error500">500</prop>     
              <prop key="errors/error404">404</prop>     
          </props>  
-         </property>
+         </property> -->
          
          
     </bean>  
@@ -277,6 +276,7 @@
 	<mvc:resources location="/img/" mapping="/img/**"/>
 	<mvc:resources location="/uploadface/" mapping="/uploadface/**"/>
 	<mvc:resources mapping="/apidoc/**" location="/apidoc/"/>
+	<mvc:resources mapping="/api-docs/**" location="/api-docs/"/>
 	
 	<!-- 拦截器配置 -->
 	<mvc:interceptors>
@@ -285,8 +285,9 @@
 			<bean class="com.face.interceptor.LoginInterceptor">
 			  <property name="allowUrls">  
 	            <list>  
-	              <value>/userinfos/Login</value>  
-	              <value>/userinfos/Register</value>  
+	              <value>/errors/</value>  
+	              <value>/userinfos/userLogin</value>  
+	              <value>/userinfos/userRegister</value>  
 	              <value>/js</value>  
 	              <value>/css</value>  
 	              <value>/image</value>  
@@ -294,6 +295,7 @@
 	              <value>/img</value>  
 	               <value>/fonts</value>  
 	               <value>/apidoc</value>  
+	               <value>/api-docs</value>  
 	            </list>  
 	          </property>
 			</bean>

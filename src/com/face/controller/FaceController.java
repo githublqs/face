@@ -40,6 +40,7 @@ import com.face.util.WebLocalPathUtil;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import com.mangofactory.swagger.annotations.ApiIgnore;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 @Api(value = "/faceRec", description = "人脸识别接口")
@@ -356,7 +357,7 @@ public class FaceController {
 		}
 		return null;
 	}
-	
+	@ApiIgnore
 	@RequestMapping(value="/uploadFaceManage" ,method = RequestMethod.GET)
 	public String uploadFaceManage() throws Exception{
 			//throw new Exception("异常测试");	

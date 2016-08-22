@@ -66,7 +66,7 @@
 	</filter-mapping>
   
   <welcome-file-list>
-   <!--  <welcome-file>index.html</welcome-file> -->
+   <welcome-file>index.html</welcome-file>
     <!-- <welcome-file>index.htm</welcome-file> -->
     <welcome-file>index.jsp</welcome-file>
     <!-- <welcome-file>default.html</welcome-file>
@@ -74,25 +74,14 @@
     <welcome-file>default.jsp</welcome-file> -->
   </welcome-file-list>
   
-   
- <!--  <error-page>
+<!--    
+<error-page>
    <error-code>404</error-code> 
-   <location>/error404.jsp</location> 
+   <location>/errors/404</location> 
    </error-page> 
-   
-
    <error-page> 
    <error-code>500</error-code> 
-   <location>/error500.jsp</location> 
-   </error-page>
-	<servlet-mapping> 
-	<servlet-name>default</servlet-name> 
-	<url-pattern>/js/*</url-pattern> 
-	<url-pattern>/css/*</url-pattern> 
-	<url-pattern>/image/*</url-pattern> 
-	<url-pattern>/img/*</url-pattern>
-	<url-pattern>/fonts/*</url-pattern>
-	<url-pattern>/apidoc/*</url-pattern>
-	<url-pattern>/uploadface/*</url-pattern>
-	 </servlet-mapping> -->
+   <location>/errors/500</location> 
+   </error-page> -->
+	
 </web-app>
