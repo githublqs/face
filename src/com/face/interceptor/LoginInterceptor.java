@@ -48,8 +48,9 @@ public class LoginInterceptor implements HandlerInterceptor{
 			return true;
 		}
 		//用户身份需要认证，跳转
-		request.getRequestDispatcher("/WEB-INF/jsp/userinfos/Login.jsp").forward(request, response);
-		return false;
+		//request.getRequestDispatcher("/WEB-INF/jsp/userinfos/Login.jsp").forward(request, response);
+		//return false;
+		return true;
 	}
 
 }
