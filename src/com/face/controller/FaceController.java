@@ -1,16 +1,28 @@
 package com.face.controller;
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.DefaultHttpClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -19,6 +31,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.face.config.Constant;
+import com.face.facepp.FacePPApi;
+import com.face.facepp.entities.Center;
+import com.face.facepp.entities.Detectresult;
+import com.face.facepp.entities.Face;
+import com.face.facepp.entities.Position;
 import com.face.po.PageInfo;
 import com.face.po.UploadFace;
 import com.face.protocol.entiy.FaceResultComputeTwoFeatureSimilarity;
@@ -34,7 +52,10 @@ import com.face.protocol.entiy.FaceResultComputeFeatureOnSpecifyFaceRect;
 import com.face.protocol.entiy.Face_Rect;
 import com.face.protocol.entiy.Face_RectAndFeature;
 import com.face.service.UploadFaceService;
+import com.face.service.UserfaceImgService;
 import com.face.service.UsernifosService;
+import com.face.util.FileUtil;
+import com.face.util.HttpRequest;
 import com.face.util.ImageResizer;
 import com.face.util.WebLocalPathUtil;
 import com.google.gson.Gson;
@@ -56,14 +77,35 @@ public class FaceController {
 	this.face_num = face_num;
 	this.face_rect = face_rect;
 	this.errorcode = errorcode;*/
-	public @ResponseBody FaceResultDet faceDetBase64(@RequestBody FaceInputEntityBase64 fieBase64){
+	public @ResponseBody FaceResultDet faceDetBase64(@RequestBody FaceInputEntityBase64 fieBase64,HttpServletRequest request,HttpServletResponse response){
 		try {
 			if(fieBase64!=null){
+				//将图片存入本地
+				File storeFile=FileUtil.newUploadFile(this);
+				FileUtil.decoderBase64File(fieBase64.getImg(),storeFile.getAbsolutePath() );
+				UploadFace uploadFace=new UploadFace();
+				uploadFace.setId(new Long(0));
+				uploadFace.setUploadimg(storeFile.getName());
+				//将路径存入 数据库
+				uploadFaceService.addUploadFace(uploadFace);
+				//调用face++接口
+				Detectresult detectresult = FacePPApi.faceDet(request, response, storeFile.getName());
 				//请求 url指向的图片拿到图像数据
 				List<Face_Rect> face_rect=new ArrayList<Face_Rect>();
-				face_rect.add(new Face_Rect(12, 34, 120, 120));
-				face_rect.add(new Face_Rect(80, 80, 240, 300));
-				FaceResultDet result=new FaceResultDet(fieBase64.getId(),2,face_rect,0);
+				//从接口中解析出人脸区域
+				if(detectresult!=null){
+					int img_width = detectresult.getImg_width();//1请求图片的宽度
+					int img_height=detectresult.getImg_height();//2请求图片的高度
+					List<Face> listFace = detectresult.getFace();
+					for (Face face : listFace) {
+						Position position = face.getPosition();
+						//根据上面5个值计算人脸相对于图片左上角的矩形区域坐标
+						Face_Rect faceRect = FacePPApi.newFaceRect(img_width,img_height,position);
+						face_rect.add(faceRect);
+						
+					}
+				}
+				FaceResultDet result=new FaceResultDet(fieBase64.getId(),face_rect.size(),face_rect,0);
 				return result;
 			}
 		} catch (Exception e) {
@@ -364,4 +406,30 @@ public class FaceController {
 		return "faceRec/uploadFaceManage";
 		
 	}
+	@RequestMapping(value="/faceppTest" ,method = RequestMethod.GET)
+	public void faceppTest(HttpServletRequest request,HttpServletResponse response){
+		String picName="head_120.png";
+		String path = request.getContextPath();  
+		String basePath = request.getScheme()+"://"+request.getServerName()+path+"/"; //+":"+request.getServerPort()
+		//测试 人脸检测与分析//detection/detect
+		//String httpUrl=Constant.generateFaceInterfaceUrl(Constant.FACEPP_detection_detect_format, basePath+"images/"+picName);
+		/*public static final String FACEPP_API_Key="DR1RqAkKmld582oEnD-e2eKUL-9WD7kh";
+		public static final String FACEPP_API_Secret="a620ebdf215750bf9bfe532fe91d53e0";*/
+		//httpUrl=http://dojochinaextjs.imwork.net/SSM/images/head_120.png
+		String httpUrl="http://apicn.faceplusplus.com/v2/detection/detect";
+		//http://dojochinaextjs.imwork.net/SSM/images/head_120.png
+		String url=basePath+"images/"+picName;
+		String param="api_key=a620ebdf215750bf9bfe532fe91d53e0&api_secret=qNt3vYHpNK9t0SIQUQzyfZquRTeiDAs2&url="+url+"&attribute=glass,pose,gender,age,race,smiling";
+		String ret= HttpRequest.sendGet(httpUrl, param);
+		ServletOutputStream out;
+		try {
+			out = response.getOutputStream();
+			out.write(ret.getBytes());
+			out.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+	}
+	
 }
