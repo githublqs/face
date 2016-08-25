@@ -95,7 +95,7 @@ public class FaceController {
 				//从接口中解析出人脸区域
 				if(detectresult!=null){
 					int img_width = detectresult.getImg_width();//1请求图片的宽度
-					int img_height=detectresult.getImg_height();//2请求图片的高度
+					int img_height=detectresult.getImgHeight();//2请求图片的高度
 					List<Face> listFace = detectresult.getFace();
 					for (Face face : listFace) {
 						Position position = face.getPosition();
@@ -398,6 +398,26 @@ public class FaceController {
 			e.printStackTrace();
 		}
 		return null;
+	}
+	@RequestMapping(value="/deletUploadFace" ,method = RequestMethod.POST)
+	public void deletUploadFace(@RequestBody UploadFace uploadFace,HttpServletRequest request,HttpServletResponse response){
+		PrintWriter out=null;
+		try {
+			out = response.getWriter();
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		}
+		JsonObject jo=new JsonObject();
+		try{
+			
+		 uploadFaceService.deleteUploadFace(uploadFace);
+		 jo.addProperty("deleteSuccess",true);
+         out.print(jo.toString());
+		}catch(Exception e){
+			e.printStackTrace();
+			jo.addProperty("deleteSuccess",true);
+	         out.print(jo.toString());
+		}
 	}
 	@ApiIgnore
 	@RequestMapping(value="/uploadFaceManage" ,method = RequestMethod.GET)

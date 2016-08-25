@@ -41,8 +41,27 @@ public class FileUtil {
 		 SingleEncrypUtil singleEncrypUtil=new SingleEncrypUtil();
 		String uploadImg= singleEncrypUtil.getHexString(singleEncrypUtil.getMD5Sole("加密字符串"))+".jpg";
 		return new File(parent,uploadImg);
-				
-		
+	}
+	public static File newUploadFileThumbnail(Object obj,File uploadFile){
+		String path=WebLocalPathUtil.getRootPath(obj);
+		String thumbHZ="thumb";
+		int hzPosition=uploadFile.getName().lastIndexOf(".");
+		String fileNameNoHZ=uploadFile.getName().substring(0, hzPosition);
+		String fileNameHZ=uploadFile.getName().substring(hzPosition);
+		File parent=new File(path+File.separator+"uploadface"+File.separator+thumbHZ+File.separator);
+		if(!parent.exists())
+		{
+			parent.mkdirs();	
+		}
+		return new File(parent,fileNameNoHZ+"_"+thumbHZ+fileNameHZ);
+	}
+	public static File getUploadFile(Object obj,String uploadFileName){
+		String path=WebLocalPathUtil.getRootPath(obj);
+		File parent=new File(path+File.separator+"uploadface"+File.separator);
+		if(!parent.exists()){
+			parent.mkdirs();	
+		}
+		return new File(parent,uploadFileName);
 	}
 	/**
 	  * 将文件转成base64 字符串

@@ -1,9 +1,15 @@
 package com.face.facepp.entities;
+import java.io.Serializable;
 import java.util.List;
 
+import org.codehaus.jackson.annotate.JsonProperty;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-   
+import com.google.gson.annotations.SerializedName;
+
+
+
+
+
 public class Detectresult{
 
 	public List<Face> getFace() {
@@ -12,11 +18,11 @@ public class Detectresult{
 	public void setFace(List<Face> face) {
 		this.face = face;
 	}
-	public int getImg_height() {
-		return img_height;
+	public int getImgHeight() {
+		return imgHeight;
 	}
-	public void setImg_height(int img_height) {
-		this.img_height = img_height;
+	public void setImgHeight(int imgHeight) {
+		this.imgHeight = imgHeight;
 	}
 	public String getImg_id() {
 		return img_id;
@@ -43,8 +49,8 @@ public class Detectresult{
 		this.url = url;
 	}
 	private List<Face> face;
-   @JsonProperty("img_height")
-   private int img_height;
+	@SerializedName("img_height")
+   private int imgHeight;
    @JsonProperty("img_id")
    private String img_id;
    @JsonProperty("img_width")

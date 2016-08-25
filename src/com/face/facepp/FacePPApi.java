@@ -10,6 +10,7 @@ import com.face.protocol.entiy.Face_Rect;
 import com.face.tool.json.JsonUtil;
 import com.face.util.HttpRequest;
 import com.google.gson.Gson;
+import com.google.gson.annotations.SerializedName;
 
 public class FacePPApi {
 	private FacePPApi(){
@@ -32,6 +33,8 @@ public class FacePPApi {
 		String ret= HttpRequest.sendGet(httpUrl, param);//{    "face": [        {            "attribute": {                "age": {                    "range": 5,                     "value": 18                },                 "gender": {                    "confidence": 99.9985,                     "value": "Female"                },                 "glass": {                    "confidence": 99.9697,                     "value": "None"                },                 "pose": {                    "pitch_angle": {                        "value": 1.9e-05                    },                     "roll_angle": {                        "value": 13.1848                    },                     "yaw_angle": {                        "value": -13.26847                    }                },                 "race": {                    "confidence": 99.0657,                     "value": "Asian"                },                 "smiling": {                    "value": 97.1243                }            },             "face_id": "82578666b8c302fc50c28325bfc761d4",             "position": {                "center": {                    "x": 50.0,                     "y": 55.0                },                 "eye_left": {                    "x": 38.628583,                     "y": 42.397333                },                 "eye_right": {                    "x": 62.459833,                     "y": 47.98025                },                 "height": 45.0,                 "mouth_left": {                    "x": 37.714333,                     "y": 66.359167                },                 "mouth_right": {                    "x": 57.593667,                     "y": 69.559167                },                 "nose": {                    "x": 46.387083,                     "y": 58.12                },                 "width": 45.0            },             "tag": ""        }    ],     "img_height": 120,     "img_id": "9d6d99094eea972b7c8c65e42bfd464f",     "img_width": 120,     "session_id": "4b8161c4db794f9ebd8be7e702ff9eee",     "url": "http://dojochinaextjs.imwork.net/SSM/uploadface/f81732766ab7bee9ae8d71dd7f4bb9a3.jpg"}
 		if(ret!=null&&!"".equals(ret)){
 			try {
+				//Detectresult 由http://api.stay4it.com/json/index.html生成 
+				//其中的@JsonProperty注解字段全为null或0 需改成@SerializedName 
 				result=JsonUtil.fromJson(ret,Detectresult.class );
 			} catch (Exception e) {
 				//暂不处理 statusCode 非200
