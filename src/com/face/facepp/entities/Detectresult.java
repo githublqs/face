@@ -1,15 +1,7 @@
 package com.face.facepp.entities;
-import java.io.Serializable;
 import java.util.List;
-
 import org.codehaus.jackson.annotate.JsonProperty;
-
 import com.google.gson.annotations.SerializedName;
-
-
-
-
-
 public class Detectresult{
 
 	public List<Face> getFace() {

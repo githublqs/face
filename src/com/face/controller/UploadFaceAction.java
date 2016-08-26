@@ -1,6 +1,7 @@
 package com.face.controller;
 import java.io.File;
 import java.io.PrintWriter;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -15,17 +16,24 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.client.HttpClientErrorException;
 
 import com.face.action.test;
+import com.face.facepp.FacePPApi;
+import com.face.facepp.entities.Detectresult;
+import com.face.facepp.entities.Position;
+import com.face.facepp.entities.recognition.compare.Similarity;
 import com.face.po.UploadFace;
 import com.face.po.UserfaceImg;
 import com.face.po.Userinfo;
 import com.face.po.UserinfoCustom;
+import com.face.protocol.entiy.FaceCompareResult;
+import com.face.protocol.entiy.Face_Rect;
 import com.face.service.UploadFaceService;
 import com.face.service.UserfaceImgService;
 import com.face.service.UsernifosService;
+import com.face.tool.json.JsonUtil;
 import com.face.util.WebLocalPathUtil;
 import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import com.mangofactory.swagger.annotations.ApiIgnore;
-
 @ApiIgnore
 @Controller
 @RequestMapping(value="/")
@@ -122,23 +130,55 @@ public String addUploadFace(@ModelAttribute(value="uploadFace")UploadFace upload
 	//double c=test.compareFace(urlComp1, urlComp2);
 	
 	//System.out.println(c);
-	java.util.Random random=new java.util.Random();// 定义随机类
+	float sim=0.0f;
+	String matching="no";
+	int errorcode=0;
+	List<Face_Rect> face_Rects=new ArrayList<Face_Rect>();
+	/*java.util.Random random=new java.util.Random();// 定义随机类
 	int result=random.nextInt(10);//[0,10)
-	float sim=result*1.0f/10;
-	boolean flag=sim>0.6;//test.compareFace(urlComp1, urlComp2)>0.6;
-	if (flag) {//如果登录成功
-		//接口需要的参数时 那我写个方法从这里取出参数 en
-		resultMap.put("matching", "yes");//这个接口怎么用示范一下
-		resultMap.put("similarity", sim);//这个接口怎么用示范一下
-		resultMap.put("errorcode",0);//这个接口怎么用示范一下
-		out.print(gson.toJson(resultMap));
-		return null;
-	}else {//如果登录不成功
-		resultMap.put("matching", "no");//这个接口怎么用示范一下
-		resultMap.put("similarity", sim);//这个接口怎么用示范一下
-		resultMap.put("errorcode",0);//这个接口怎么用示范一下
-		out.print(gson.toJson(resultMap));
+	sim=result*1.0f/10;*/
+	Detectresult detectresult0 = FacePPApi.faceDet(request, response, (String)request.getAttribute("img0"));
+	
+	if(detectresult0.getFace().size()==1){
+		Detectresult detectresult1 = FacePPApi.faceDet(request, response, uploadFace.getUploadimg());
+		if(detectresult1.getFace().size()==1){
+			String face_id1 = detectresult0.getFace().get(0).getFace_id();
+			String face_id2 = detectresult1.getFace().get(0).getFace_id();
+			try {
+				Similarity similarity=FacePPApi.recognitionCompare(face_id1,face_id2);
+				sim=(float) similarity.getSimilarity();
+				
+				face_Rects.add(FacePPApi.newFaceRect(detectresult0.getImg_width(), detectresult0.getImgHeight(),
+						detectresult0.getFace().get(0).getPosition()));
+				
+				face_Rects.add(FacePPApi.newFaceRect(detectresult1.getImg_width(), detectresult1.getImgHeight(),
+						detectresult1.getFace().get(0).getPosition()));
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			
+			boolean flag=sim>0.6;//test.compareFace(urlComp1, urlComp2)>0.6;
+			if (flag) {//如果登录成功
+				//接口需要的参数时 那我写个方法从这里取出参数 en
+			/*	resultMap.put("matching", "yes");//这个接口怎么用示范一下
+				resultMap.put("similarity", sim);//这个接口怎么用示范一下
+				resultMap.put("errorcode",0);//这个接口怎么用示范一下
+			out.print(gson.toJson(resultMap));*/	
+				matching="yes";
+			}else {//如果登录不成功
+				/*resultMap.put("matching", "no");//这个接口怎么用示范一下
+				resultMap.put("similarity", sim);//这个接口怎么用示范一下
+				resultMap.put("errorcode",0);//这个接口怎么用示范一下
+				out.print(gson.toJson(resultMap));*/
+				matching="no";
+				
+			}
+			
+		}
 	}
+	FaceCompareResult faceCompareResult=new FaceCompareResult( matching,  sim,  errorcode,
+			 face_Rects);
+	gson.toJson(faceCompareResult, FaceCompareResult.class, out);
 	return null;
 }
 

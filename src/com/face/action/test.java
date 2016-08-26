@@ -38,12 +38,12 @@ public class test {
 	if(path1!=""&&!"".equals(path1)){
 		s_FREyeFace sd1=new s_FREyeFace();
 		byte []s=getBytes(path1);
-		int reval=faceLib.DetectDTFace(s, s.length, sd1, iNum1); 
+		int reval=faceLib.DetectDTFace(s, s.length, sd1, iNum1); //检测人脸
 		if(iNum1[0]==0){
 			System.out.println("iNum1û����");
 			return 0.0f;
 		}
-		int dd=	faceLib.ExtractFaceFeatureFromFile(path1,sd1,featureByte1,feature1);
+		int dd=	faceLib.ExtractFaceFeatureFromFile(path1,sd1,featureByte1,feature1);//从人脸中提取特种
 	}if(path2!=""&&!"".equals(path2)){
 		s_FREyeFace sd2=new s_FREyeFace();
 		byte []s=getBytes(path2);

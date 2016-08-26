@@ -10,13 +10,13 @@ public class Position {
    private EyeLeft eye_left;
    @JsonProperty("eye_right")
    private EyeRight eye_right;
-   private int height;
+   private double height;
    @JsonProperty("mouth_left")
    private MouthLeft mouth_left;
    @JsonProperty("mouth_right")
    private MouthRight mouth_right;
    private Nose nose;
-   private int width;
+   private double width;
 public Center getCenter() {
 	return center;
 }
@@ -35,10 +35,10 @@ public EyeRight getEye_right() {
 public void setEye_right(EyeRight eye_right) {
 	this.eye_right = eye_right;
 }
-public int getHeight() {
+public double getHeight() {
 	return height;
 }
-public void setHeight(int height) {
+public void setHeight(double height) {
 	this.height = height;
 }
 public MouthLeft getMouth_left() {
@@ -59,10 +59,10 @@ public Nose getNose() {
 public void setNose(Nose nose) {
 	this.nose = nose;
 }
-public int getWidth() {
+public double getWidth() {
 	return width;
 }
-public void setWidth(int width) {
+public void setWidth(double width) {
 	this.width = width;
 }
 

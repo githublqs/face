@@ -92,20 +92,28 @@ public class FaceController {
 				Detectresult detectresult = FacePPApi.faceDet(request, response, storeFile.getName());
 				//请求 url指向的图片拿到图像数据
 				List<Face_Rect> face_rect=new ArrayList<Face_Rect>();
+				StringBuilder sb=new StringBuilder();
 				//从接口中解析出人脸区域
 				if(detectresult!=null){
 					int img_width = detectresult.getImg_width();//1请求图片的宽度
 					int img_height=detectresult.getImgHeight();//2请求图片的高度
 					List<Face> listFace = detectresult.getFace();
+					
+					int i=0;
 					for (Face face : listFace) {
 						Position position = face.getPosition();
 						//根据上面5个值计算人脸相对于图片左上角的矩形区域坐标
 						Face_Rect faceRect = FacePPApi.newFaceRect(img_width,img_height,position);
 						face_rect.add(faceRect);
+						if(i>0){
+							sb.append(",");
+						}
+						sb.append(face.getFace_id());
+						i++;
 						
 					}
 				}
-				FaceResultDet result=new FaceResultDet(fieBase64.getId(),face_rect.size(),face_rect,0);
+				FaceResultDet result=new FaceResultDet(sb.toString(),face_rect.size(),face_rect,0);
 				return result;
 			}
 		} catch (Exception e) {

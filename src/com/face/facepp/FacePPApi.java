@@ -6,6 +6,7 @@ import com.face.config.Constant;
 import com.face.facepp.entities.Center;
 import com.face.facepp.entities.Detectresult;
 import com.face.facepp.entities.Position;
+import com.face.facepp.entities.recognition.compare.Similarity;
 import com.face.protocol.entiy.Face_Rect;
 import com.face.tool.json.JsonUtil;
 import com.face.util.HttpRequest;
@@ -30,7 +31,7 @@ public class FacePPApi {
 		String httpUrl="http://apicn.faceplusplus.com/v2/detection/detect";
 		String url=getImageUrl(request,fileName);
 		String param="api_key="+Constant.api_key_facepp+"&api_secret="+Constant.api_secret_facepp+"&url="+url+"&attribute=glass,pose,gender,age,race,smiling";
-		String ret= HttpRequest.sendGet(httpUrl, param);//{    "face": [        {            "attribute": {                "age": {                    "range": 5,                     "value": 18                },                 "gender": {                    "confidence": 99.9985,                     "value": "Female"                },                 "glass": {                    "confidence": 99.9697,                     "value": "None"                },                 "pose": {                    "pitch_angle": {                        "value": 1.9e-05                    },                     "roll_angle": {                        "value": 13.1848                    },                     "yaw_angle": {                        "value": -13.26847                    }                },                 "race": {                    "confidence": 99.0657,                     "value": "Asian"                },                 "smiling": {                    "value": 97.1243                }            },             "face_id": "82578666b8c302fc50c28325bfc761d4",             "position": {                "center": {                    "x": 50.0,                     "y": 55.0                },                 "eye_left": {                    "x": 38.628583,                     "y": 42.397333                },                 "eye_right": {                    "x": 62.459833,                     "y": 47.98025                },                 "height": 45.0,                 "mouth_left": {                    "x": 37.714333,                     "y": 66.359167                },                 "mouth_right": {                    "x": 57.593667,                     "y": 69.559167                },                 "nose": {                    "x": 46.387083,                     "y": 58.12                },                 "width": 45.0            },             "tag": ""        }    ],     "img_height": 120,     "img_id": "9d6d99094eea972b7c8c65e42bfd464f",     "img_width": 120,     "session_id": "4b8161c4db794f9ebd8be7e702ff9eee",     "url": "http://dojochinaextjs.imwork.net/SSM/uploadface/f81732766ab7bee9ae8d71dd7f4bb9a3.jpg"}
+		String ret= HttpRequest.sendGet(httpUrl, param);
 		if(ret!=null&&!"".equals(ret)){
 			try {
 				//Detectresult 由http://api.stay4it.com/json/index.html生成 
@@ -41,7 +42,49 @@ public class FacePPApi {
 				e.printStackTrace();
 			}
 		}
+		//{    "face": [        {            "attribute": {                "age": {                    "range": 7,                     "value": 45                },                 "gender": {                    "confidence": 99.9995,                     "value": "Male"                },                 "glass": {                    "confidence": 99.5741,                     "value": "Normal"                },                 "pose": {                    "pitch_angle": {                        "value": 0.008547                    },                     "roll_angle": {                        "value": -2.16337                    },                     "yaw_angle": {                        "value": -10.435651                    }                },                 "race": {                    "confidence": 99.5124,                     "value": "Asian"                },                 "smiling": {                    "value": 10.6257                }            },             "face_id": "fe420e7446dfae0136e6cdff5cf9fb7b",             "position": {                "center": {                    "x": 46.774194,                     "y": 42.666667                },                 "eye_left": {                    "x": 36.364516,                     "y": 36.805                },                 "eye_right": {                    "x": 57.420046,                     "y": 36.229667                },                 "height": 29.333333,                 "mouth_left": {                    "x": 39.388479,                     "y": 53.237167                },                 "mouth_right": {                    "x": 53.908065,                     "y": 53.220167                },                 "nose": {                    "x": 44.659447,                     "y": 44.3885                },                 "width": 40.552995            },             "tag": ""        }    ],     "img_height": 1600,     "img_id": "032e5e6306986d615500cc6581f270d2",     "img_width": 1159,     "session_id": "c2f6716cbdaf43ada3112315e41f2998",     "url": "http://dojochinaextjs.imwork.net/SSM/uploadface/dc4578704a224ee9b09769cfa7383060.jpg"}
 		return result;
+	} 
+	/**
+	 * 计算两个Face的相似性以及五官相似度
+	 * @param face_id1
+	 * @param face_id2
+	 * @param request
+	 * @param response
+	 * @return
+	 */
+	public static Similarity recognitionCompare(String face_id1,String face_id2){
+		Similarity similarity=null;
+		String httpUrl="https://apicn.faceplusplus.com/v2/recognition/compare";
+		String param="api_secret="+Constant.api_secret_facepp+"&api_key="+Constant.api_key_facepp+
+				"&face_id2="+
+				face_id2
+				+"&face_id1="+
+				face_id1;
+		
+		String ret= HttpRequest.sendGet(httpUrl, param);
+		if(ret!=null&&!"".equals(ret)){
+			try {
+				similarity=JsonUtil.fromJson(ret,Similarity.class );
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+		return similarity;
+		
+	} 
+	public static String recognitionCompare2(String face_id1,String face_id2){
+		String httpUrl="https://apicn.faceplusplus.com/v2/recognition/compare";
+		String param="api_secret="+Constant.api_secret_facepp+"&api_key="+Constant.api_key_facepp+
+				"&face_id2="+
+				face_id2
+				+"&face_id1="+
+				face_id1;
+		
+		String ret= HttpRequest.sendGet(httpUrl, param);
+		
+		return ret;
+		
 	} 
 	/**
 	 * 从 uploadface文件加下通过图片名称
@@ -64,14 +107,16 @@ public class FacePPApi {
 	public static Face_Rect newFaceRect(int img_width, int img_height,
 			Position position) {
 		Center center=position.getCenter();//3 检出的人脸框的中心点坐标, x & y 坐标分别表示在图片中的宽度和高度的百分比 (0~100之间的实数)
-		int face_width = position.getWidth();//4 0~100之间的实数，表示检出的脸的宽度在图片中百分比
-		int face_height = position.getHeight();//50~100之间的实数，表示检出的脸的宽度在图片中百分比
-		float left=center.getX()-(face_width*1.0f/2);
-		float top=center.getY()-(face_height*1.0f/2);
+		int face_width = (int) position.getWidth();//4 0~100之间的实数，表示检出的脸的宽度在图片中百分比
+		int face_height = (int) position.getHeight();//50~100之间的实数，表示检出的脸的宽度在图片中百分比
+		float left=(float) (center.getX()-(face_width*1.0f/2));
+		float top=(float) (center.getY()-(face_height*1.0f/2));
 		return new Face_Rect((int)(left*img_width/100),
 				(int)(top*img_height/100), (int)(face_width*img_width*1.0f/100),
 				(int)(face_height*img_height*1.0f/100));
 		
 	}
+	
+	
 
 }
